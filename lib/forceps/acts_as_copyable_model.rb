@@ -246,8 +246,8 @@ module Forceps
 
       def copy_associated_objects_in_has_many(local_object, remote_object, association_name, path)
         filter = has_many_filter_for(remote_object, association_name)
-        relation = remote_object.send(association_name)
-        filter.call(relation).find_each do |remote_associated_object|
+        collection = remote_object.send(association_name)
+        filter.call(remote_object, collection).find_each do |remote_associated_object|
           copy(remote_associated_object, association_attribute_for(local_object, association_name), path + [[remote_object, association_name]])
         end
       end
@@ -314,7 +314,7 @@ module Forceps
 
       def has_many_filter_for(remote_object, association_name)
         filters = has_many_filters[remote_object.class.base_class] || {}
-        filters[association_name] || ->(collection) {collection}
+        filters[association_name] || ->(remote_object, collection) {collection}
       end
 
       def has_many_filters
