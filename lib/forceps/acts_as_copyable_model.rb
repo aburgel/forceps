@@ -210,6 +210,11 @@ module Forceps
         logger.debug "#{left_margin}#{message}"
       end
 
+      def warn(message)
+        left_margin = "  "*level
+        logger.warn "#{left_margin}#{message}"
+      end
+
       def copy_associated_objects(local_object, remote_object, path)
         with_nested_logging do
           [:has_many, :has_one, :has_and_belongs_to_many].each do |association_kind|
@@ -281,7 +286,7 @@ module Forceps
             if @options[:raise_on_loops]
               raise msg
             else
-              debug msg
+              warn msg
             end
           end
         end
