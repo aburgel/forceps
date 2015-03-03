@@ -143,12 +143,11 @@ module Forceps
         options[callback_name] || {}
       end
 
-      # Using setters explicitly to avoid having to mess with disabling mass protection in Rails 3
       def copy_attributes(target_object, attributes_map)
         make_type_attribute_point_to_local_class_if_needed(attributes_map)
 
         attributes_map.each do |attribute_name, attribute_value|
-          target_object.send("#{attribute_name}=", attribute_value) rescue debug("Failed to set '#{attribute_name}='. Different schemas in the remote and local databases? - #{$!}")
+          target_object[attribute_name] = attribute_value rescue debug("Failed to write attribute '#{attribute_name}'. Different schemas in the remote and local databases? - #{$!}")
         end
       end
 
