@@ -286,6 +286,8 @@ module Forceps
 
       def detect_loops(remote_object, path)
         if @initial_object.class == remote_object.class && @initial_object.id != remote_object.id
+          return if loop_seen?(remote_object)
+
           "Loop detected - #{(path.map {|(path_object, association_name)| association_debug(path_object, association_name)}).join(', ')} - #{as_trace(remote_object)}".tap do |msg|
             if @options[:raise_on_loops]
               raise msg
@@ -293,6 +295,17 @@ module Forceps
               warn msg
             end
           end
+        end
+      end
+
+      def loop_seen?(remote_object)
+        @detected_loops ||= Set.new
+        loop_endpoint = [remote_object.class, remote_object.id]
+        if @detected_loops.include?(loop_endpoint)
+          true
+        else
+          @detected_loops.add(loop_endpoint)
+          false
         end
       end
 
