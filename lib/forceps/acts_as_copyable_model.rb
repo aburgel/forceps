@@ -80,6 +80,7 @@ module Forceps
       end
 
       def finders_for_reusing_classes
+        # TODO config for using primary key as default finder
         options[:reuse] || {}
       end
 
@@ -147,7 +148,11 @@ module Forceps
         make_type_attribute_point_to_local_class_if_needed(attributes_map)
 
         attributes_map.each do |attribute_name, attribute_value|
-          target_object[attribute_name] = attribute_value rescue debug("Failed to write attribute '#{attribute_name}'. Different schemas in the remote and local databases? - #{$!}")
+          begin
+            target_object[attribute_name] = attribute_value
+          rescue
+            warn "Failed to write attribute '#{attribute_name}' for #{target_object.class}. Different schemas in the remote and local databases? - #{$!}"
+          end
         end
       end
 
